@@ -25,7 +25,7 @@ from efficientvit.apps.utils import (
     zero_last_gamma,
 )
 from efficientvit.models.utils import build_kwargs_from_config, load_state_dict_from_file
-
+from typing import List, Type
 __all__ = [
     "save_exp_config",
     "setup_dist_env",
@@ -87,7 +87,7 @@ def setup_exp_config(config_path: str, recursive=True, opt_args: dict or None = 
 
 
 def setup_data_provider(
-    exp_config: dict, data_provider_classes: list[type[DataProvider]], is_distributed: bool = True
+    exp_config: dict, data_provider_classes: List[Type[DataProvider]], is_distributed: bool = True
 ) -> DataProvider:
     dp_config = exp_config["data_provider"]
     dp_config["num_replicas"] = get_dist_size() if is_distributed else None
@@ -103,7 +103,7 @@ def setup_data_provider(
     return data_provider
 
 
-def setup_run_config(exp_config: dict, run_config_cls: type[RunConfig]) -> RunConfig:
+def setup_run_config(exp_config: dict, run_config_cls: Type[RunConfig]) -> RunConfig:
     exp_config["run_config"]["init_lr"] = exp_config["run_config"]["base_lr"] * get_dist_size()
 
     run_config = run_config_cls(**exp_config["run_config"])

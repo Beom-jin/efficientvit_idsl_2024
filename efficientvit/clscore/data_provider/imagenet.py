@@ -14,14 +14,14 @@ from efficientvit.apps.data_provider.augment import RandAug
 from efficientvit.apps.data_provider.random_resolution import MyRandomResizedCrop, get_interpolate
 from efficientvit.apps.utils import partial_update_config
 from efficientvit.models.utils import val2list
-
+from typing import Tuple
 __all__ = ["ImageNetDataProvider"]
 
 
 class ImageNetDataProvider(DataProvider):
     name = "imagenet"
 
-    data_dir = "/dataset/imagenet"
+    data_dir = "/home/sonic/data/imagenet"
     n_classes = 1000
     _DEFAULT_RRC_CONFIG = {
         "train_interpolate": "random",
@@ -64,7 +64,7 @@ class ImageNetDataProvider(DataProvider):
             drop_last,
         )
 
-    def build_valid_transform(self, image_size: tuple[int, int] or None = None) -> any:
+    def build_valid_transform(self, image_size: Tuple[int, int] or None = None) -> any:
         image_size = (image_size or self.active_image_size)[0]
         crop_size = int(math.ceil(image_size / self.rrc_config["test_crop_ratio"]))
         return transforms.Compose(
@@ -79,7 +79,7 @@ class ImageNetDataProvider(DataProvider):
             ]
         )
 
-    def build_train_transform(self, image_size: tuple[int, int] or None = None) -> any:
+    def build_train_transform(self, image_size: Tuple[int, int] or None = None) -> any:
         image_size = image_size or self.image_size
 
         # random_resize_crop -> random_horizontal_flip
@@ -112,7 +112,7 @@ class ImageNetDataProvider(DataProvider):
         ]
         return transforms.Compose(train_transforms)
 
-    def build_datasets(self) -> tuple[any, any, any]:
+    def build_datasets(self) -> Tuple[any, any, any]:
         train_transform = self.build_train_transform()
         valid_transform = self.build_valid_transform()
 

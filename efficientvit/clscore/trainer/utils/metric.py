@@ -3,11 +3,11 @@
 # International Conference on Computer Vision (ICCV), 2023
 
 import torch
-
+from typing import List
 __all__ = ["accuracy"]
 
 
-def accuracy(output: torch.Tensor, target: torch.Tensor, topk=(1,)) -> list[torch.Tensor]:
+def accuracy(output: torch.Tensor, target: torch.Tensor, topk=(1,)) -> List[torch.Tensor]:
     """Computes the precision@k for the specified values of k."""
     maxk = max(topk)
     batch_size = target.shape[0]

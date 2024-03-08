@@ -17,7 +17,7 @@ from efficientvit.models.nn import (
     UpSampleLayer,
 )
 from efficientvit.models.utils import build_kwargs_from_config
-
+from typing import List, Tuple, Dict
 __all__ = [
     "EfficientViTSeg",
     "efficientvit_seg_b0",
@@ -32,9 +32,9 @@ __all__ = [
 class SegHead(DAGBlock):
     def __init__(
         self,
-        fid_list: list[str],
-        in_channel_list: list[int],
-        stride_list: list[int],
+        fid_list: List[str],
+        in_channel_list: List[int],
+        stride_list: List[int],
         head_stride: int,
         head_width: int,
         head_depth: int,

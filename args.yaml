@@ -1,0 +1,10 @@
+config: /home/sonic/efficientvit_idsl_2024/configs/cls/imagenet/b1.yaml
+path: /home/sonic/efficientvit_idsl_2024
+gpu: '2'
+manual_seed: 0
+resume: false
+fp16: false
+rand_init: trunc_normal@0.02
+last_gamma: 0
+auto_restart_thresh: 1.0
+save_freq: 1

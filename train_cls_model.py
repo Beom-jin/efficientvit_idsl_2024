@@ -32,7 +32,6 @@ def main():
     # parse args
     args, opt = parser.parse_known_args()
     opt = parse_unknown_args(opt)
-
     # setup gpu and distributed training
     setup.setup_dist_env(args.gpu)
 

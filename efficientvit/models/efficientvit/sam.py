@@ -31,7 +31,7 @@ from efficientvit.models.nn import (
     build_norm,
 )
 from efficientvit.models.utils import build_kwargs_from_config, get_device
-
+from typing import Tuple, List
 __all__ = [
     "SamPad",
     "SamResize",
@@ -88,7 +88,7 @@ class SamResize:
         return np.array(resize(to_pil_image(image), target_size))
 
     @staticmethod
-    def get_preprocess_shape(oldh: int, oldw: int, long_side_length: int) -> tuple[int, int]:
+    def get_preprocess_shape(oldh: int, oldw: int, long_side_length: int) -> Tuple[int, int]:
         """
         Compute the output size given input size and target long side length.
         """
@@ -105,8 +105,8 @@ class SamResize:
 class SamNeck(DAGBlock):
     def __init__(
         self,
-        fid_list: list[str],
-        in_channel_list: list[int],
+        fid_list: List[str],
+        in_channel_list: List[int],
         head_width: int,
         head_depth: int,
         expand_ratio: float,
@@ -199,7 +199,7 @@ class EfficientViTSam(nn.Module):
         image_encoder: EfficientViTSamImageEncoder,
         prompt_encoder: PromptEncoder,
         mask_decoder: MaskDecoder,
-        image_size: tuple[int, int] = (1024, 512),
+        image_size: Tuple[int, int] = (1024, 512),
     ) -> None:
         super().__init__()
         self.image_encoder = image_encoder
@@ -223,8 +223,8 @@ class EfficientViTSam(nn.Module):
     def postprocess_masks(
         self,
         masks: torch.Tensor,
-        input_size: tuple[int, ...],
-        original_size: tuple[int, ...],
+        input_size: Tuple[int, ...],
+        original_size: Tuple[int, ...],
     ) -> torch.Tensor:
         masks = F.interpolate(
             masks,
@@ -296,7 +296,7 @@ class EfficientViTSamPredictor:
         mask_input: np.ndarray or None = None,
         multimask_output: bool = True,
         return_logits: bool = False,
-    ) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
+    ) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
         """
         Predict masks for the given input prompts, using the currently set image.
 
@@ -372,7 +372,7 @@ class EfficientViTSamPredictor:
         mask_input: torch.Tensor or None = None,
         multimask_output: bool = True,
         return_logits: bool = False,
-    ) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
+    ) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
         """
         Predict masks for the given input prompts, using the currently set image.
         Input prompts are batched torch tensors and are expected to already be
@@ -455,7 +455,7 @@ class EfficientViTSamAutomaticMaskGenerator(SamAutomaticMaskGenerator):
         crop_nms_thresh: float = 0.7,
         crop_overlap_ratio: float = 512 / 1500,
         crop_n_points_downscale_factor: int = 1,
-        point_grids: list[np.ndarray] or None = None,
+        point_grids: List[np.ndarray] or None = None,
         min_mask_region_area: int = 0,
         output_mode: str = "binary_mask",
     ) -> None:

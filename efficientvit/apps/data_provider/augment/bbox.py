@@ -3,7 +3,7 @@
 # International Conference on Computer Vision (ICCV), 2023
 
 import numpy as np
-
+from typing import Tuple
 __all__ = ["rand_bbox"]
 
 
@@ -12,7 +12,7 @@ def rand_bbox(
     w: int,
     lam: float,
     rand_func: callable = np.random.uniform,
-) -> tuple[int, int, int, int]:
+) -> Tuple[int, int, int, int]:
     """randomly sample bbox, used in cutmix"""
     cut_rat = np.sqrt(1.0 - lam)
     cut_w = w * cut_rat
