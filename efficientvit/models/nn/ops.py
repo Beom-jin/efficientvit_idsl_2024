@@ -110,7 +110,11 @@ class LinearLayer(nn.Module):
         super(LinearLayer, self).__init__()
 
         self.dropout = nn.Dropout(dropout, inplace=False) if dropout > 0 else None
-        self.linear = nn.Linear(in_features, out_features, use_bias)
+        #self.linear = nn.Linear(in_features, out_features, use_bias)
+        r = 100
+        self.linear_w1 = nn.Linear(in_features, r, use_bias)
+        self.linear_w2 = nn.Linear(r, out_features, use_bias)
+
         self.norm = build_norm(norm, num_features=out_features)
         self.act = build_act(act_func)
 
@@ -123,7 +127,9 @@ class LinearLayer(nn.Module):
         x = self._try_squeeze(x)
         if self.dropout:
             x = self.dropout(x)
-        x = self.linear(x)
+        #x = self.linear(x)
+        x = self.linear_w1(x)
+        x = self.linear_w2(x)
         if self.norm:
             x = self.norm(x)
         if self.act:
@@ -357,14 +363,33 @@ class LiteMLA(nn.Module):
         act_func = val2tuple(act_func, 2)
 
         self.dim = dim
-        self.qkv = ConvLayer(
+        # self.qkv = ConvLayer(
+        #     in_channels,
+        #     3 * total_dim,
+        #     1,
+        #     use_bias=use_bias[0],
+        #     norm=norm[0],
+        #     act_func=act_func[0],
+        # )
+        r = 100
+        self.qkv_w_1 = ConvLayer(
             in_channels,
+            r,
+            1,
+            use_bias=use_bias[0],
+            norm=None,
+            act_func=act_func[0],
+        )
+
+        self.qkv_w_2 = ConvLayer(
+            r,
             3 * total_dim,
             1,
             use_bias=use_bias[0],
             norm=norm[0],
             act_func=act_func[0],
         )
+
         self.aggreg = nn.ModuleList(
             [
                 nn.Sequential(
@@ -383,8 +408,26 @@ class LiteMLA(nn.Module):
         )
         self.kernel_func = build_act(kernel_func, inplace=False)
 
-        self.proj = ConvLayer(
+        # self.proj = ConvLayer(
+        #     total_dim * (1 + len(scales)),
+        #     out_channels,
+        #     1,
+        #     use_bias=use_bias[1],
+        #     norm=norm[1],
+        #     act_func=act_func[1],
+        # )
+
+        self.proj_w_1 = ConvLayer(
             total_dim * (1 + len(scales)),
+            r,
+            1,
+            use_bias=use_bias[1],
+            norm=None,
+            act_func=act_func[1],
+        )
+
+        self.proj_w_2 = ConvLayer(
+            r,
             out_channels,
             1,
             use_bias=use_bias[1],
@@ -433,14 +476,17 @@ class LiteMLA(nn.Module):
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         # generate multi-scale q, k, v
-        qkv = self.qkv(x)
+        #qkv = self.qkv(x)
+        qkv = self.qkv_w_1(x)
+        qkv = self.qkv_w_2(qkv)
         multi_scale_qkv = [qkv]
         for op in self.aggreg:
             multi_scale_qkv.append(op(qkv))
         multi_scale_qkv = torch.cat(multi_scale_qkv, dim=1)
 
         out = self.relu_linear_att(multi_scale_qkv)
-        out = self.proj(out)
+        out = self.proj_w_1(out)
+        out = self.proj_w_2(out)
 
         return out
 

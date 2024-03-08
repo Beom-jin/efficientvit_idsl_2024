@@ -1,4 +1,4 @@
-config: /home/sonic/efficientvit_idsl_2024/configs/cls/imagenet/b1.yaml
+config: /home/sonic/efficientvit_idsl_2024/configs/cls/imagenet/b2.yaml
 path: /home/sonic/efficientvit_idsl_2024
 gpu: '2'
 manual_seed: 0
