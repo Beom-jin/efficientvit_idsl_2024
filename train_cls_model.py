@@ -28,6 +28,9 @@ parser.add_argument("--auto_restart_thresh", type=float, default=1.0)
 parser.add_argument("--save_freq", type=int, default=1)
 
 
+def count_parameters(model):
+    return sum(p.numel() for p in model.parameters() if p.requires_grad)
+
 def main():
     # parse args
     args, opt = parser.parse_known_args()
@@ -56,6 +59,10 @@ def main():
 
     # setup model
     model = create_cls_model(config["net_config"]["name"], False, dropout=config["net_config"]["dropout"])
+    print(model)
+    params = count_parameters(model)
+    print("MODEL PARAMS = " , params/1e6 , "M")
+    
     apply_drop_func(model.backbone.stages, config["backbone_drop"])
 
     # setup trainer
