@@ -6,7 +6,7 @@ import torch
 import torch.nn as nn
 
 from efficientvit.models.efficientvit.backbone import EfficientViTBackbone, EfficientViTLargeBackbone
-from efficientvit.models.nn import ConvLayer, LinearLayer, OpSequential
+from efficientvit.models.nn import ConvLayer, LinearLayer, OpSequential, Default_LinearLayer
 from efficientvit.models.utils import build_kwargs_from_config
 from typing import List, Dict
 __all__ = [
@@ -37,8 +37,8 @@ class ClsHead(OpSequential):
         ops = [
             ConvLayer(in_channels, width_list[0], 1, norm=norm, act_func=act_func),
             nn.AdaptiveAvgPool2d(output_size=1),
-            LinearLayer(width_list[0], width_list[1], False, norm="ln", act_func=act_func),
-            LinearLayer(width_list[1], n_classes, True, dropout, None, None),
+            Default_LinearLayer(width_list[0], width_list[1], False, norm="ln", act_func=act_func, r=50),
+            Default_LinearLayer(width_list[1], n_classes, True, dropout, None, None, r= None),
         ]
         super().__init__(ops)
 

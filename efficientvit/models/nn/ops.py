@@ -25,6 +25,7 @@ __all__ = [
     "ResidualBlock",
     "DAGBlock",
     "OpSequential",
+    "Default_LinearLayer",
 ]
 
 
@@ -136,6 +137,51 @@ class LinearLayer(nn.Module):
             x = self.act(x)
         return x
 
+class Default_LinearLayer(nn.Module):
+    def __init__(
+        self,
+        in_features: int,
+        out_features: int,
+        use_bias=True,
+        dropout=0,
+        norm=None,
+        act_func=None,
+        r = None,
+    ):
+        super(Default_LinearLayer, self).__init__()
+        self.low_rank = r
+        self.dropout = nn.Dropout(dropout, inplace=False) if dropout > 0 else None
+        if( r is not None):
+            self.linear_w1 = nn.Linear(in_features,r,use_bias)
+            self.linear_w2 = nn.Linear(r,out_features,use_bias)
+        else:
+            self.linear = nn.Linear(in_features, out_features, use_bias)
+    
+
+        self.norm = build_norm(norm, num_features=out_features)
+        self.act = build_act(act_func)
+
+    def _try_squeeze(self, x: torch.Tensor) -> torch.Tensor:
+        if x.dim() > 2:
+            x = torch.flatten(x, start_dim=1)
+        return x
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        x = self._try_squeeze(x)
+        if self.dropout:
+            x = self.dropout(x)
+        
+        if self.low_rank is not None:
+            x = self.linear_w1(x)
+            x = self.linear_w2(x)
+        else:
+            x = self.linear(x)
+
+        if self.norm:
+            x = self.norm(x)
+        if self.act:
+            x = self.act(x)
+        return x
 
 class IdentityLayer(nn.Module):
     def forward(self, x: torch.Tensor) -> torch.Tensor:
