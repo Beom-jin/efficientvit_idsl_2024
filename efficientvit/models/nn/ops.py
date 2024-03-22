@@ -112,7 +112,7 @@ class LinearLayer(nn.Module):
 
         self.dropout = nn.Dropout(dropout, inplace=False) if dropout > 0 else None
         #self.linear = nn.Linear(in_features, out_features, use_bias)
-        r = 150
+        r = 200
         self.linear_w1 = nn.Linear(in_features, r, use_bias)
         self.linear_w2 = nn.Linear(r, out_features, use_bias)
 
@@ -149,15 +149,9 @@ class Default_LinearLayer(nn.Module):
         r = None,
     ):
         super(Default_LinearLayer, self).__init__()
-        self.low_rank = r
-        self.dropout = nn.Dropout(dropout, inplace=False) if dropout > 0 else None
-        if( r is not None):
-            self.linear_w1 = nn.Linear(in_features,r,use_bias)
-            self.linear_w2 = nn.Linear(r,out_features,use_bias)
-        else:
-            self.linear = nn.Linear(in_features, out_features, use_bias)
-    
 
+        self.dropout = nn.Dropout(dropout, inplace=False) if dropout > 0 else None
+        self.linear = nn.Linear(in_features, out_features, use_bias)
         self.norm = build_norm(norm, num_features=out_features)
         self.act = build_act(act_func)
 
@@ -171,11 +165,8 @@ class Default_LinearLayer(nn.Module):
         if self.dropout:
             x = self.dropout(x)
         
-        if self.low_rank is not None:
-            x = self.linear_w1(x)
-            x = self.linear_w2(x)
-        else:
-            x = self.linear(x)
+       
+        x = self.linear(x)
 
         if self.norm:
             x = self.norm(x)
@@ -417,7 +408,7 @@ class LiteMLA(nn.Module):
             norm=norm[0],
             act_func=act_func[0],
         )
-        r = 100
+        r = 75
         # self.qkv_w_1 = ConvLayer(
         #     in_channels,
         #     r,
