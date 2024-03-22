@@ -112,7 +112,7 @@ class LinearLayer(nn.Module):
 
         self.dropout = nn.Dropout(dropout, inplace=False) if dropout > 0 else None
         #self.linear = nn.Linear(in_features, out_features, use_bias)
-        r = 100
+        r = 150
         self.linear_w1 = nn.Linear(in_features, r, use_bias)
         self.linear_w2 = nn.Linear(r, out_features, use_bias)
 
