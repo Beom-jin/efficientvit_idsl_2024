@@ -400,32 +400,32 @@ class LiteMLA(nn.Module):
         act_func = val2tuple(act_func, 2)
 
         self.dim = dim
-        self.qkv = ConvLayer(
-            in_channels,
-            3 * total_dim,
-            1,
-            use_bias=use_bias[0],
-            norm=norm[0],
-            act_func=act_func[0],
-        )
-        r = 75
-        # self.qkv_w_1 = ConvLayer(
+        # self.qkv = ConvLayer(
         #     in_channels,
-        #     r,
-        #     1,
-        #     use_bias=use_bias[0],
-        #     norm=None,
-        #     act_func=act_func[0],
-        # )
-
-        # self.qkv_w_2 = ConvLayer(
-        #     r,
         #     3 * total_dim,
         #     1,
         #     use_bias=use_bias[0],
         #     norm=norm[0],
         #     act_func=act_func[0],
         # )
+        r = 50
+        self.qkv_w_1 = ConvLayer(
+            in_channels,
+            r,
+            1,
+            use_bias=use_bias[0],
+            norm=None,
+            act_func=act_func[0],
+        )
+
+        self.qkv_w_2 = ConvLayer(
+            r,
+            3 * total_dim,
+            1,
+            use_bias=use_bias[0],
+            norm=norm[0],
+            act_func=act_func[0],
+        )
 
         self.aggreg = nn.ModuleList(
             [
@@ -513,9 +513,9 @@ class LiteMLA(nn.Module):
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         # generate multi-scale q, k, v
-        qkv = self.qkv(x)
-        # qkv = self.qkv_w_1(x)
-        # qkv = self.qkv_w_2(qkv)
+        #qkv = self.qkv(x)
+        qkv = self.qkv_w_1(x)
+        qkv = self.qkv_w_2(qkv)
         multi_scale_qkv = [qkv]
         for op in self.aggreg:
             multi_scale_qkv.append(op(qkv))
